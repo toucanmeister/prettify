@@ -46,39 +46,31 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
     img_file.close();
 }
 
-// Convolutional filter, takes the mean over the 3x3 Square around each pixel
-unsigned char* mean_filter(unsigned char *img, int width, int height) {
+// Convolutional filter, takes the mean over a square around each pixel
+unsigned char* mean_filter(unsigned char *img, int width, int height, int radius=1) {
+    if (radius%2 != 1) {
+        cout << "Error: Radius has to be odd number." << endl;
+        return img;
+    }
+    if (radius > (width/2)-1 || radius > (height/2)-1) {
+        cout << "Error: Radius too large for image." << endl;
+        return img;
+    }
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
+
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
-                int sum = img[i*width*3 + j*3 + c];
-                if (i-1 >= 0) {
-                    if (j-1 >= 0) {
-                        sum += img[(i-1)*width*3 + (j-1)*3 + c];
-                    }
-                    sum += img[(i-1)*width*3 + j*3 + c];
-                    if (j+1 < width) {
-                        sum += img[(i-1)*width*3 + (j+1)*3 + c];
+                unsigned int sum = 0;
+                for (int x=-radius; x <= radius; x++) {
+                    for (int y=-radius; y <= radius; y++) {
+                        if (i+x < height && i+x >= 0 && j+x < width && j+x >= 0) {
+                            sum += img[(i+x)*width*3 + (j+y)*3 + c];
+                        }
                     }
                 }
-                if (j-1 >= 0) {
-                    sum += img[i*width*3 + (j-1)*3 + c];
-                }
-                if (j+1 < width) {
-                    sum += img[i*width*3 + (j+1)*3 + c];
-                }
-                if (i+1 < height) {
-                    if (j-1 >= 0) {
-                        sum += img[(i+1)*width*3 + (j-1)*3 + c];
-                    }
-                    sum += img[(i+1)*width*3 + j*3 + c];
-                    if (j+1 < width) {
-                        sum += img[(i+1)*width*3 + (j+1)*3 + c];
-                    }
-                }
-                new_img[i*width*3 + j*3 + c] =  (char) (sum/9);
+                new_img[i*width*3 + j*3 + c] =  (char) (sum / ((radius*2+1) * (radius*2+1)));
             }
         }
     }
@@ -87,6 +79,8 @@ unsigned char* mean_filter(unsigned char *img, int width, int height) {
     delete[] tmp;
     return img;
 }
+
+
 
 int main() {
     int width, height;
