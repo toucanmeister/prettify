@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 using namespace std;
 
@@ -48,10 +49,6 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
 
 // Convolutional filter, takes the mean over a square around each pixel
 unsigned char* mean_filter(unsigned char *img, int width, int height, int radius=1) {
-    if (radius%2 != 1) {
-        cout << "Error: Radius has to be odd number." << endl;
-        return img;
-    }
     if (radius > (width/2)-1 || radius > (height/2)-1) {
         cout << "Error: Radius too large for image." << endl;
         return img;
@@ -65,12 +62,60 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
                 unsigned int sum = 0;
                 for (int x=-radius; x <= radius; x++) {
                     for (int y=-radius; y <= radius; y++) {
-                        if (i+x < height && i+x >= 0 && j+x < width && j+x >= 0) {
+                        if (i+x < height && i+x >= 0 && j+x < width && j+x >= 0) { // Edge cases are ignored, with large radii this causes shadows
                             sum += img[(i+x)*width*3 + (j+y)*3 + c];
                         }
                     }
                 }
                 new_img[i*width*3 + j*3 + c] =  (char) (sum / ((radius*2+1) * (radius*2+1)));
+            }
+        }
+    }
+    unsigned char *tmp = img;
+    img = new_img;
+    delete[] tmp;
+    return img;
+}
+
+inline float gauss_2d(float mu, float sigma, float x, float y) {
+    return (1.0 / (2.0*M_PI*sigma*sigma)) * exp(-(x*x + y*y)/(2.0*sigma*sigma));
+}
+
+// Convolutional filter, takes the gaussian-weighted mean over a square around each pixel
+unsigned char* gauss_filter(unsigned char *img, int width, int height, float sigma=1) {
+    int radius = 3*sigma; // this gives us 99% of the mass under the gaussian
+    if (radius > (width/2)-1 || radius > (height/2)-1) {
+        cout << "Error: Sigma too large for image." << endl;
+        return img;
+    }
+    if (sigma < 0) {
+        cout << "Error: Sigma has to be positive." << endl;
+    }
+
+    float kernel[(radius*2+1) * (radius*2+1)];
+    float weight = 0;
+    for (int x=-radius; x <= radius; x++) {
+        for (int y=-radius; y <= radius; y++) {
+            float tmp = gauss_2d(0, sigma, x, y);
+            kernel[(x+radius)*(2*radius+1) + (y+radius)] = tmp;
+            weight += tmp;
+        }
+    }
+    size_t size = width*height*3;
+    unsigned char *new_img = new unsigned char[size];
+    
+    for (int i=0; i < height; i++) {
+        for (int j=0; j < width; j++) {
+            for (int c=0; c < 3; c++) {
+                float sum = 0;
+                for (int x=-radius; x <= radius; x++) {
+                    for (int y=-radius; y <= radius; y++) {
+                        if (i+x < height && i+x >= 0 && j+y < width && j+y >= 0) {
+                            sum += img[(i+x)*width*3 + (j+y)*3 + c] * kernel[(x+radius)*(2*radius+1) + (y+radius)];
+                        }
+                    }
+                }
+                new_img[i*width*3 + j*3 + c] =  (char) (sum / weight);
             }
         }
     }
@@ -88,7 +133,7 @@ int main() {
     char out_filename[] = "out.ppm";
     unsigned char *img;
     img = read_image(in_filename, img, &width, &height);
-    img = mean_filter(img, width, height);
+    img = gauss_filter(img, width, height, 1);
     write_image(out_filename, img, width, height);
     delete[] img;
     return 0;
