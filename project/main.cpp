@@ -67,7 +67,7 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
                         }
                     }
                 }
-                new_img[i*width*3 + j*3 + c] =  (char) (sum / ((radius*2+1) * (radius*2+1)));
+                new_img[i*width*3 + j*3 + c] =  (unsigned char) (sum / ((radius*2+1) * (radius*2+1)));
             }
         }
     }
@@ -77,6 +77,7 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
     return img;
 }
 
+// Helper function for the gauss filter
 inline float gauss_2d(float mu, float sigma, float x, float y) {
     return (1.0 / (2.0*M_PI*sigma*sigma)) * exp(-(x*x + y*y)/(2.0*sigma*sigma));
 }
@@ -115,7 +116,55 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
                         }
                     }
                 }
-                new_img[i*width*3 + j*3 + c] =  (char) (sum / weight);
+                new_img[i*width*3 + j*3 + c] =  (unsigned char) (sum / weight);
+            }
+        }
+    }
+    unsigned char *tmp = img;
+    img = new_img;
+    delete[] tmp;
+    return img;
+}
+
+// Helper function for median_filter
+void insertionSort(unsigned char arr[], int n)
+{
+    int i, j;
+    unsigned char key;
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+  
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+// Nonlinear filter that takes the median over a square around each pixel
+unsigned char* median_filter(unsigned char *img, int width, int height, int radius=1) {
+    if (radius > (width/2)-1 || radius > (height/2)-1) {
+        cout << "Error: Radius too large for image." << endl;
+        return img;
+    }
+    size_t size = width*height*3;
+    unsigned char *new_img = new unsigned char[size];
+    int n = (2*radius+1)*(2*radius+1);
+    for (int i=0; i < height; i++) {
+        for (int j=0; j < width; j++) {
+            for (int c=0; c < 3; c++) {
+                unsigned char arr[n] = {0};
+                for (int x=-radius; x <= radius; x++) {
+                    for (int y=-radius; y <= radius; y++) {
+                        if (i+x < height && i+x >= 0 && j+x < width && j+x >= 0) { 
+                            arr[(x+radius)*(2*radius+1) + (y+radius)] = img[(i+x)*width*3 + (j+y)*3 + c];
+                        }
+                    }
+                }
+                insertionSort(arr, n);
+                new_img[i*width*3 + j*3 + c] =  arr[n/2];
             }
         }
     }
@@ -133,7 +182,7 @@ int main() {
     char out_filename[] = "out.ppm";
     unsigned char *img;
     img = read_image(in_filename, img, &width, &height);
-    img = gauss_filter(img, width, height, 1);
+    img = median_filter(img, width, height, 2);
     write_image(out_filename, img, width, height);
     delete[] img;
     return 0;
