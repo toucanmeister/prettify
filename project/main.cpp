@@ -175,12 +175,31 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
 }
 
 
+inline void print_usage() {
+    cout << "Usage: " << argv[0] << " input_file output_file [routines]" << endl;
+}
 
-int main() {
-    int width, height;
-    char in_filename[] = "in.ppm";
-    char out_filename[] = "out.ppm";
+int main(int argc, char *argv[]) {
+    const mean_id = "mean";
+    const gauss_id = "gauss";
+    const median_id = "median";
+    char *in_filename;
+    char *out_filename;
+    if (argc < 3) {
+        print_usage();
+        cout << "Use " << argv[0] << " --help or " << argv[0] << " -h for more information" << endl;
+    }
+    if (strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")==0) {
+        cout << "prettify: Simple command-line-based scanned document enhancer" << endl;
+        print_usage();
+        cout << "input_file and output_file need to be P3 (ASCII-encoded) portable pix map (.ppm) files without comments." << endl;
+        cout << "[routines] can contain any (even multiple) of the following, in any order: " << endl;
+        cout << mean_id << endl << gauss_id << endl << median_id << endl;
+    }
+
+
     unsigned char *img;
+    int width, height;
     img = read_image(in_filename, img, &width, &height);
     img = median_filter(img, width, height, 2);
     write_image(out_filename, img, width, height);
