@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <cstring>
 
 using namespace std;
 
@@ -8,8 +9,13 @@ using namespace std;
 unsigned char* read_image(char filename[], unsigned char *img, int *width, int *height) {
     ifstream img_file;
     img_file.open(filename, ios::in);
-    char format[3];
+    string format;
     img_file >> format;
+    if (format != "P3") {
+        cerr << "Error: Input file has to be P3 (ASCII-encoded) .ppm file." << endl;
+        img_file.close();
+        return nullptr;
+    }
     int maxVal;
     img_file >> *width >> *height >> maxVal;
     size_t size = (*width) * (*height) * 3; // times 3 for each rgb channel
@@ -50,7 +56,7 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
 // Convolutional filter, takes the mean over a square around each pixel
 unsigned char* mean_filter(unsigned char *img, int width, int height, int radius=1) {
     if (radius > (width/2)-1 || radius > (height/2)-1) {
-        cout << "Error: Radius too large for image." << endl;
+        cerr << "Error: Radius too large for image." << endl;
         return img;
     }
     size_t size = width*height*3;
@@ -86,11 +92,11 @@ inline float gauss_2d(float mu, float sigma, float x, float y) {
 unsigned char* gauss_filter(unsigned char *img, int width, int height, float sigma=1) {
     int radius = 3*sigma; // this gives us 99% of the mass under the gaussian
     if (radius > (width/2)-1 || radius > (height/2)-1) {
-        cout << "Error: Sigma too large for image." << endl;
+        cerr << "Error: Sigma too large for image." << endl;
         return img;
     }
     if (sigma < 0) {
-        cout << "Error: Sigma has to be positive." << endl;
+        cerr << "Error: Sigma has to be positive." << endl;
     }
 
     float kernel[(radius*2+1) * (radius*2+1)];
@@ -146,7 +152,7 @@ void insertionSort(unsigned char arr[], int n)
 // Nonlinear filter that takes the median over a square around each pixel
 unsigned char* median_filter(unsigned char *img, int width, int height, int radius=1) {
     if (radius > (width/2)-1 || radius > (height/2)-1) {
-        cout << "Error: Radius too large for image." << endl;
+        cerr << "Error: Radius too large for image." << endl;
         return img;
     }
     size_t size = width*height*3;
@@ -175,32 +181,39 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
 }
 
 
-inline void print_usage() {
-    cout << "Usage: " << argv[0] << " input_file output_file [routines]" << endl;
+inline void print_usage(char *program_name) {
+    cout << "Usage: " << program_name << " input_file output_file [routines]" << endl;
 }
 
 int main(int argc, char *argv[]) {
-    const mean_id = "mean";
-    const gauss_id = "gauss";
-    const median_id = "median";
+    const string mean_id = "mean";
+    const string gauss_id = "gauss";
+    const string median_id = "median";
     char *in_filename;
     char *out_filename;
     if (argc < 3) {
-        print_usage();
+        print_usage(argv[0]);
         cout << "Use " << argv[0] << " --help or " << argv[0] << " -h for more information" << endl;
+        return 0;
     }
     if (strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")==0) {
         cout << "prettify: Simple command-line-based scanned document enhancer" << endl;
-        print_usage();
+        print_usage(argv[0]);
         cout << "input_file and output_file need to be P3 (ASCII-encoded) portable pix map (.ppm) files without comments." << endl;
         cout << "[routines] can contain any (even multiple) of the following, in any order: " << endl;
         cout << mean_id << endl << gauss_id << endl << median_id << endl;
+        return 0;
     }
+    in_filename = argv[1];
+    out_filename = argv[2];
 
 
     unsigned char *img;
     int width, height;
     img = read_image(in_filename, img, &width, &height);
+    if (img == nullptr) {
+        return 1;
+    }
     img = median_filter(img, width, height, 2);
     write_image(out_filename, img, width, height);
     delete[] img;
