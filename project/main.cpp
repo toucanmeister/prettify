@@ -41,6 +41,7 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
         << 255 << endl;
     size_t size = width * height * 3;
     unsigned currentVal;
+    cout << "Writing image " << filename << endl;
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
@@ -59,6 +60,8 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
         cerr << "Error: Radius too large for image." << endl;
         return img;
     }
+    cout << "Applying mean filter with radius " << radius << endl;
+
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
 
@@ -97,7 +100,9 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
     }
     if (sigma < 0) {
         cerr << "Error: Sigma has to be positive." << endl;
+        return img;
     }
+    cout << "Applying gauss filter with sigma " << sigma << endl;
 
     float kernel[(radius*2+1) * (radius*2+1)];
     float weight = 0;
@@ -155,6 +160,8 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
         cerr << "Error: Radius too large for image." << endl;
         return img;
     }
+    cout << "Applying median filter with radius " << radius << endl;
+
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
     int n = (2*radius+1)*(2*radius+1);
@@ -186,7 +193,7 @@ inline void print_usage(char *program_name) {
 }
 
 int main(int argc, char *argv[]) {
-    const string mean_id = "mean";
+    const string mean_id = "mean"; // Names of the routines the user can invoke
     const string gauss_id = "gauss";
     const string median_id = "median";
     char *in_filename;
@@ -201,7 +208,9 @@ int main(int argc, char *argv[]) {
         print_usage(argv[0]);
         cout << "input_file and output_file need to be P3 (ASCII-encoded) portable pix map (.ppm) files without comments." << endl;
         cout << "[routines] can contain any (even multiple) of the following, in any order: " << endl;
-        cout << mean_id << endl << gauss_id << endl << median_id << endl;
+        cout << mean_id << " [radius]" << endl 
+             << gauss_id << " [sigma]" << endl 
+             << median_id << " [radius]" << endl;
         return 0;
     }
     in_filename = argv[1];
@@ -214,7 +223,34 @@ int main(int argc, char *argv[]) {
     if (img == nullptr) {
         return 1;
     }
-    img = median_filter(img, width, height, 2);
+
+    for (int i=3; i < argc; i++) {
+        if (mean_id.compare(argv[i]) == 0) {
+            int radius = 1;
+            if (i+1 < argc && atoi(argv[i+1])) {
+                radius = atoi(argv[i+1]);
+                i++; // Next argument was the radius -> skip next iteration
+            }
+            img = mean_filter(img, width, height, radius);
+        } else if (gauss_id.compare(argv[i]) == 0) {
+            int sigma = 1;
+            if (i+1 < argc && atoi(argv[i+1])) {
+                sigma = atoi(argv[i+1]);
+                i++;
+            }
+            img = gauss_filter(img, width, height, sigma);
+        } else if (median_id.compare(argv[i]) == 0) {
+            int radius = 1;
+            if (i+1 < argc && atoi(argv[i+1])) {
+                radius = atoi(argv[i+1]);
+                i++;
+            }
+            img = median_filter(img, width, height, radius);
+        } else {
+            print_usage(argv[0]);
+            return 0;
+        }
+    }
     write_image(out_filename, img, width, height);
     delete[] img;
     return 0;
