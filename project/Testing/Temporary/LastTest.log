@@ -1,0 +1,37 @@
+Start testing: Jan 04 11:24 CET
+----------------------------------------------------------
+1/2 Testing: Read_Img
+1/2 Test: Read_Img
+Command: "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test" "1"
+Directory: /mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project
+"Read_Img" start time: Jan 04 11:24 CET
+Output:
+----------------------------------------------------------
+Reading image test/in.ppm with width 1936 and height 2592
+<end of output>
+Test time =   1.07 sec
+----------------------------------------------------------
+Test Passed.
+"Read_Img" end time: Jan 04 11:24 CET
+"Read_Img" time elapsed: 00:00:01
+----------------------------------------------------------
+
+2/2 Testing: Write_Img
+2/2 Test: Write_Img
+Command: "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test" "2"
+Directory: /mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project
+"Write_Img" start time: Jan 04 11:24 CET
+Output:
+----------------------------------------------------------
+Reading image test/in.ppm with width 1936 and height 2592
+Writing image test/out.ppm
+Reading image test/out.ppm with width 1936 and height 2592
+<end of output>
+Test time =   2.57 sec
+----------------------------------------------------------
+Test Passed.
+"Write_Img" end time: Jan 04 11:24 CET
+"Write_Img" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Jan 04 11:24 CET

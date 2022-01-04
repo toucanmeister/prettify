@@ -9,10 +9,26 @@
 /mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/main.cpp
 iostream
 -
+string
+-
+cstring
+-
+prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp
+iostream
+-
 fstream
 -
 cmath
 -
 cstring
+-
+prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+string
 -
 

@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/main.cpp" "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles/prettify.dir/main.cpp.o"
+  "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp" "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles/prettify.dir/prettify.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
