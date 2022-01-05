@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/prettify_test.dir/prettify.cpp.o"
-  "CMakeFiles/prettify_test.dir/prettify_test.cpp.o"
+  "CMakeFiles/prettify_test.dir/source/prettify.cpp.o"
+  "CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o"
   "prettify_test"
   "prettify_test.pdb"
 )

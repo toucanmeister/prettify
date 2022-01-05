@@ -6,5 +6,5 @@ CXX_FLAGS =   -fopenmp -std=c++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I"/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source" -I"/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test" 
 

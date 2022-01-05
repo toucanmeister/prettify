@@ -511,89 +511,89 @@ ContinuousSubmit/fast:
 	$(MAKE) -f CMakeFiles/ContinuousSubmit.dir/build.make CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
 
-main.o: main.cpp.o
+source/main.o: source/main.cpp.o
 
-.PHONY : main.o
-
-# target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/main.cpp.o
-.PHONY : main.cpp.o
-
-main.i: main.cpp.i
-
-.PHONY : main.i
-
-# target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/main.cpp.i
-.PHONY : main.cpp.i
-
-main.s: main.cpp.s
-
-.PHONY : main.s
-
-# target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/main.cpp.s
-.PHONY : main.cpp.s
-
-prettify.o: prettify.cpp.o
-
-.PHONY : prettify.o
+.PHONY : source/main.o
 
 # target to build an object file
-prettify.cpp.o:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify.cpp.o
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/prettify.cpp.o
-.PHONY : prettify.cpp.o
+source/main.cpp.o:
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/main.cpp.o
+.PHONY : source/main.cpp.o
 
-prettify.i: prettify.cpp.i
+source/main.i: source/main.cpp.i
 
-.PHONY : prettify.i
+.PHONY : source/main.i
 
 # target to preprocess a source file
-prettify.cpp.i:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify.cpp.i
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/prettify.cpp.i
-.PHONY : prettify.cpp.i
+source/main.cpp.i:
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/main.cpp.i
+.PHONY : source/main.cpp.i
 
-prettify.s: prettify.cpp.s
+source/main.s: source/main.cpp.s
 
-.PHONY : prettify.s
+.PHONY : source/main.s
 
 # target to generate assembly for a file
-prettify.cpp.s:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify.cpp.s
-	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/prettify.cpp.s
-.PHONY : prettify.cpp.s
+source/main.cpp.s:
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/main.cpp.s
+.PHONY : source/main.cpp.s
 
-prettify_test.o: prettify_test.cpp.o
+source/prettify.o: source/prettify.cpp.o
 
-.PHONY : prettify_test.o
+.PHONY : source/prettify.o
 
 # target to build an object file
-prettify_test.cpp.o:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify_test.cpp.o
-.PHONY : prettify_test.cpp.o
+source/prettify.cpp.o:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/source/prettify.cpp.o
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/prettify.cpp.o
+.PHONY : source/prettify.cpp.o
 
-prettify_test.i: prettify_test.cpp.i
+source/prettify.i: source/prettify.cpp.i
 
-.PHONY : prettify_test.i
+.PHONY : source/prettify.i
 
 # target to preprocess a source file
-prettify_test.cpp.i:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify_test.cpp.i
-.PHONY : prettify_test.cpp.i
+source/prettify.cpp.i:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/source/prettify.cpp.i
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/prettify.cpp.i
+.PHONY : source/prettify.cpp.i
 
-prettify_test.s: prettify_test.cpp.s
+source/prettify.s: source/prettify.cpp.s
 
-.PHONY : prettify_test.s
+.PHONY : source/prettify.s
 
 # target to generate assembly for a file
-prettify_test.cpp.s:
-	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/prettify_test.cpp.s
-.PHONY : prettify_test.cpp.s
+source/prettify.cpp.s:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/source/prettify.cpp.s
+	$(MAKE) -f CMakeFiles/prettify.dir/build.make CMakeFiles/prettify.dir/source/prettify.cpp.s
+.PHONY : source/prettify.cpp.s
+
+test/prettify_test.o: test/prettify_test.cpp.o
+
+.PHONY : test/prettify_test.o
+
+# target to build an object file
+test/prettify_test.cpp.o:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o
+.PHONY : test/prettify_test.cpp.o
+
+test/prettify_test.i: test/prettify_test.cpp.i
+
+.PHONY : test/prettify_test.i
+
+# target to preprocess a source file
+test/prettify_test.cpp.i:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/test/prettify_test.cpp.i
+.PHONY : test/prettify_test.cpp.i
+
+test/prettify_test.s: test/prettify_test.cpp.s
+
+.PHONY : test/prettify_test.s
+
+# target to generate assembly for a file
+test/prettify_test.cpp.s:
+	$(MAKE) -f CMakeFiles/prettify_test.dir/build.make CMakeFiles/prettify_test.dir/test/prettify_test.cpp.s
+.PHONY : test/prettify_test.cpp.s
 
 # Help Target
 help:
@@ -634,15 +634,15 @@ help:
 	@echo "... ContinuousMemCheck"
 	@echo "... ContinuousTest"
 	@echo "... ContinuousSubmit"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... prettify.o"
-	@echo "... prettify.i"
-	@echo "... prettify.s"
-	@echo "... prettify_test.o"
-	@echo "... prettify_test.i"
-	@echo "... prettify_test.s"
+	@echo "... source/main.o"
+	@echo "... source/main.i"
+	@echo "... source/main.s"
+	@echo "... source/prettify.o"
+	@echo "... source/prettify.i"
+	@echo "... source/prettify.s"
+	@echo "... test/prettify_test.o"
+	@echo "... test/prettify_test.i"
+	@echo "... test/prettify_test.s"
 .PHONY : help
 
 

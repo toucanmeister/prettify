@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
-string
--
-
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test.cpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test/prettify_test.cpp
 iostream
 -
 cstring
 -
 prettify.hpp
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test/prettify.hpp
+
+source/prettify.hpp
+string
+-
 

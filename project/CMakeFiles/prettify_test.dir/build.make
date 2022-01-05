@@ -57,42 +57,42 @@ include CMakeFiles/prettify_test.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/prettify_test.dir/flags.make
 
-CMakeFiles/prettify_test.dir/prettify_test.cpp.o: CMakeFiles/prettify_test.dir/flags.make
-CMakeFiles/prettify_test.dir/prettify_test.cpp.o: prettify_test.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/prettify_test.dir/prettify_test.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/prettify_test.dir/prettify_test.cpp.o -c "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test.cpp"
+CMakeFiles/prettify_test.dir/source/prettify.cpp.o: CMakeFiles/prettify_test.dir/flags.make
+CMakeFiles/prettify_test.dir/source/prettify.cpp.o: source/prettify.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/prettify_test.dir/source/prettify.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/prettify_test.dir/source/prettify.cpp.o -c "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.cpp"
 
-CMakeFiles/prettify_test.dir/prettify_test.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/prettify_test.dir/prettify_test.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test.cpp" > CMakeFiles/prettify_test.dir/prettify_test.cpp.i
+CMakeFiles/prettify_test.dir/source/prettify.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/prettify_test.dir/source/prettify.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.cpp" > CMakeFiles/prettify_test.dir/source/prettify.cpp.i
 
-CMakeFiles/prettify_test.dir/prettify_test.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/prettify_test.dir/prettify_test.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify_test.cpp" -o CMakeFiles/prettify_test.dir/prettify_test.cpp.s
+CMakeFiles/prettify_test.dir/source/prettify.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/prettify_test.dir/source/prettify.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.cpp" -o CMakeFiles/prettify_test.dir/source/prettify.cpp.s
 
-CMakeFiles/prettify_test.dir/prettify.cpp.o: CMakeFiles/prettify_test.dir/flags.make
-CMakeFiles/prettify_test.dir/prettify.cpp.o: prettify.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/prettify_test.dir/prettify.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/prettify_test.dir/prettify.cpp.o -c "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp"
+CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o: CMakeFiles/prettify_test.dir/flags.make
+CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o: test/prettify_test.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o -c "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test/prettify_test.cpp"
 
-CMakeFiles/prettify_test.dir/prettify.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/prettify_test.dir/prettify.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp" > CMakeFiles/prettify_test.dir/prettify.cpp.i
+CMakeFiles/prettify_test.dir/test/prettify_test.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/prettify_test.dir/test/prettify_test.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test/prettify_test.cpp" > CMakeFiles/prettify_test.dir/test/prettify_test.cpp.i
 
-CMakeFiles/prettify_test.dir/prettify.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/prettify_test.dir/prettify.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp" -o CMakeFiles/prettify_test.dir/prettify.cpp.s
+CMakeFiles/prettify_test.dir/test/prettify_test.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/prettify_test.dir/test/prettify_test.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/test/prettify_test.cpp" -o CMakeFiles/prettify_test.dir/test/prettify_test.cpp.s
 
 # Object files for target prettify_test
 prettify_test_OBJECTS = \
-"CMakeFiles/prettify_test.dir/prettify_test.cpp.o" \
-"CMakeFiles/prettify_test.dir/prettify.cpp.o"
+"CMakeFiles/prettify_test.dir/source/prettify.cpp.o" \
+"CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o"
 
 # External object files for target prettify_test
 prettify_test_EXTERNAL_OBJECTS =
 
-prettify_test: CMakeFiles/prettify_test.dir/prettify_test.cpp.o
-prettify_test: CMakeFiles/prettify_test.dir/prettify.cpp.o
+prettify_test: CMakeFiles/prettify_test.dir/source/prettify.cpp.o
+prettify_test: CMakeFiles/prettify_test.dir/test/prettify_test.cpp.o
 prettify_test: CMakeFiles/prettify_test.dir/build.make
 prettify_test: /usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so
 prettify_test: /usr/lib/x86_64-linux-gnu/libpthread.so

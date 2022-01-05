@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/main.cpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/main.cpp
 iostream
 -
 string
@@ -14,9 +14,9 @@ string
 cstring
 -
 prettify.hpp
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.hpp
 
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.cpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.cpp
 iostream
 -
 fstream
@@ -26,9 +26,9 @@ cmath
 cstring
 -
 prettify.hpp
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.hpp
 
-/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/prettify.hpp
+/mnt/h/Uni/Semester 5/Algorithm Engineering/algorithm_engineering/project/source/prettify.hpp
 string
 -
 
