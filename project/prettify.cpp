@@ -107,8 +107,8 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
 
 
 // Helper function for the gauss filter
-inline float gauss_2d(float mu, float sigma, float x, float y) {
-    return (1.0 / (2.0*M_PI*sigma*sigma)) * exp(-(x*x + y*y)/(2.0*sigma*sigma));
+inline float gauss(float mu, float sigma, float x) {
+    return (1.0 / (sqrt(2.0*M_PI)*sigma)) * exp(-(x*x)/(2.0*sigma*sigma));
 }
 
 // Convolutional filter, takes the gaussian-weighted mean over a square around each pixel
@@ -125,34 +125,46 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
     }
     cout << "Applying gauss filter with sigma " << sigma << endl;
 
-    float kernel[(radius*2+1) * (radius*2+1)];
+    float kernel[2*radius+1];
     float weight = 0;
-    for (int x=-radius; x <= radius; x++) {
-        for (int y=-radius; y <= radius; y++) {
-            float tmp = gauss_2d(0, sigma, x, y);
-            kernel[(x+radius)*(2*radius+1) + (y+radius)] = tmp;
-            weight += tmp;
-        }
+    for (int x=-radius; x <= radius; x++) { // Initialize a 1d-kernel of normally distributed weights
+        float tmp = gauss(0, sigma, x);
+        kernel[x+radius] = tmp;
+        weight += tmp;
     }
     size_t size = width*height*3;
-    unsigned char *new_img = new unsigned char[size];
+    unsigned char *tmp_img = new unsigned char[size];
     
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
-                float sum = 0;
+                unsigned int sum = 0;
                 for (int x=-radius; x <= radius; x++) {
-                    for (int y=-radius; y <= radius; y++) {
-                        if (i+x < height && i+x >= 0 && j+y < width && j+y >= 0) {
-                            sum += img[(i+x)*width*3 + (j+y)*3 + c] * kernel[(x+radius)*(2*radius+1) + (y+radius)];
-                        }
+                    if (j+x < width && j+x >= 0) { // Edge cases are ignored, with large radii this causes shadows
+                        sum += img[i*width*3 + (j+x)*3 + c] * kernel[x+radius];
                     }
                 }
-                new_img[i*width*3 + j*3 + c] =  (unsigned char) (sum / weight);
+                tmp_img[i*width*3 + j*3 + c] = (unsigned char) (sum / weight);
+            }
+        }
+    }
+    unsigned char *new_img = new unsigned char[size];
+
+    for (int j=0; j < width; j++) {
+        for (int i=0; i < height; i++) {
+            for (int c=0; c < 3; c++) {
+                unsigned int sum = 0;
+                for (int y=-radius; y <= radius; y++) {
+                    if (i+y < height && i+y >= 0) {
+                        sum += tmp_img[(i+y)*width*3 + j*3 + c] * kernel[y+radius];
+                    }
+                }
+                new_img[i*width*3 + j*3 + c] = (unsigned char) (sum / weight);
             }
         }
     }
     delete[] img;
+    delete[] tmp_img;
     return new_img;
 }
 
