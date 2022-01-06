@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/prettify.dir/source/main.cpp.o CMakeFiles/prettify.dir/source/prettify.cpp.o  -o prettify  /usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so /usr/lib/x86_64-linux-gnu/libpthread.so 

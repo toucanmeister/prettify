@@ -1,8 +1,0 @@
-Unit_Tests 0 0
-Read_Img 11 0.0324238
-Write_Img 9 0.0205274
-Mean_Filter 7 0.0263857
-Gauss_Filter 6 0.0304627
-Median_Filter 5 0.0365033
-Threshold_Mean 5 0.0368244
----

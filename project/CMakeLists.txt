@@ -9,15 +9,11 @@ include(CTest)
 
 find_package(OpenMP REQUIRED)
 
-add_executable(prettify)
-target_include_directories(prettify PRIVATE source)
-target_sources(prettify PRIVATE source/main.cpp PRIVATE source/prettify.cpp)
+add_executable(prettify main.cpp prettify.cpp)
 target_link_libraries(prettify PUBLIC OpenMP::OpenMP_CXX)
 
 enable_testing()
-add_executable(prettify_test)
-target_include_directories(prettify_test PRIVATE source PRIVATE test)
-target_sources(prettify_test PRIVATE source/prettify.cpp PRIVATE test/prettify_test.cpp)
+add_executable(prettify_test prettify.cpp prettify_test.cpp)
 target_link_libraries(prettify_test PUBLIC OpenMP::OpenMP_CXX)
 add_test(Read_Img prettify_test 1)
 add_test(Write_Img prettify_test 2)
