@@ -61,7 +61,7 @@ int mean_filter_test() {
         return 1;
     }
     for (int i=0; i < width*height*3; i++) {
-        if (*(img+i) != *(check+i)) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
             delete[] img;
             delete[] check;
             return 1;
@@ -87,7 +87,7 @@ int gauss_filter_test() {
         return 1;
     }
     for (int i=0; i < width*height*3; i++) {
-        if (*(img+i) != *(check+i)) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
             delete[] img;
             delete[] check;
             return 1;
@@ -113,7 +113,7 @@ int median_filter_test() {
         return 1;
     }
     for (int i=0; i < width*height*3; i++) {
-        if (*(img+i) != *(check+i)) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
             delete[] img;
             delete[] check;
             return 1;
@@ -139,7 +139,7 @@ int threshold_mean_test() {
         return 1;
     }
     for (int i=0; i < width*height*3; i++) {
-        if (*(img+i) != *(check+i)) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
             delete[] img;
             delete[] check;
             return 1;

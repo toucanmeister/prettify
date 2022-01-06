@@ -2,13 +2,13 @@
 
 Repository for exam assignment answers, project and paper for the course Algorithm Engineering in WiSe 2021/22.
 
-## Answers
+#### Answers
 Contains the answers to the weekly exam assignments.
 
-## Project
+#### Project
 Contains the course project. See **prettify** below for more details.
 
-## Paper
+#### Paper
 Contains the paper corresponding to the coursing project.
 
 

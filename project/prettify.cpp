@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cmath>
 #include <cstring>
+#include <omp.h>
 #include "prettify.hpp"
 
 using namespace std;
@@ -26,7 +27,7 @@ unsigned char* read_image(char filename[], unsigned char *img, int *width, int *
     img_file >> *width >> *height >> maxVal;
     size_t size = (*width) * (*height) * 3; // times 3 for each rgb channel
     img = new unsigned char[size];
-    unsigned currentVal;
+    unsigned int currentVal; // Intermediary value to read the numbers properly (char would read single chars)
     cout << "Reading image " << filename << " with width " << *width << " and height " << *height << endl;
     for (int i=0; i < size; i++) {
         img_file >> currentVal;
@@ -44,14 +45,14 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
     img_file << format << endl
         << width << " "
         << height << endl
-        << 255 << endl;
+        << 255 << endl; // max value for each rgb channel
     size_t size = width * height * 3;
-    unsigned currentVal;
+    unsigned int currentVal;
     cout << "Writing image " << filename << endl;
-    for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j++) {
-            for (int c=0; c < 3; c++) {
-                currentVal = (unsigned) img[i*width*3 + j*3 + c];
+    for (int i=0; i < height; i++) { // Over all rows
+        for (int j=0; j < width; j++) { // Over pixels in a row
+            for (int c=0; c < 3; c++) { // Over rgb channels
+                currentVal = (unsigned) img[i*width*3 + j*3 + c]; // We go i rows down, and j pixels to the right, times three for rgb channels
                 img_file << currentVal << " ";
             }
         }
@@ -68,30 +69,42 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
         return img;
     }
     cout << "Applying mean filter with radius " << radius << endl;
-
     size_t size = width*height*3;
-    unsigned char *new_img = new unsigned char[size];
+    unsigned char *tmp_img = new unsigned char[size];
 
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
                 unsigned int sum = 0;
                 for (int x=-radius; x <= radius; x++) {
-                    for (int y=-radius; y <= radius; y++) {
-                        if (i+x < height && i+x >= 0 && j+y < width && j+y >= 0) { // Edge cases are ignored, with large radii this causes shadows
-                            sum += img[(i+x)*width*3 + (j+y)*3 + c];
-                        }
+                    if (j+x < width && j+x >= 0) { // Edge cases are ignored, with large radii this causes shadows
+                        sum += img[i*width*3 + (j+x)*3 + c];
                     }
                 }
-                new_img[i*width*3 + j*3 + c] =  (unsigned char) (sum / ((radius*2+1) * (radius*2+1)));
+                tmp_img[i*width*3 + j*3 + c] = (unsigned char) (sum / (radius*2+1));
             }
         }
     }
-    unsigned char *tmp = img;
-    img = new_img;
-    delete[] tmp;
-    return img;
+    unsigned char *new_img = new unsigned char[size];
+
+    for (int j=0; j < width; j++) {
+        for (int i=0; i < height; i++) {
+            for (int c=0; c < 3; c++) {
+                unsigned int sum = 0;
+                for (int y=-radius; y <= radius; y++) {
+                    if (i+y < height && i+y >= 0) {
+                        sum += tmp_img[(i+y)*width*3 + j*3 + c];
+                    }
+                }
+                new_img[i*width*3 + j*3 + c] = (unsigned char) (sum / (radius*2+1));
+            }
+        }
+    }
+    delete[] img;
+    delete[] tmp_img;
+    return new_img;
 }
+
 
 // Helper function for the gauss filter
 inline float gauss_2d(float mu, float sigma, float x, float y) {
@@ -139,10 +152,8 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
             }
         }
     }
-    unsigned char *tmp = img;
-    img = new_img;
-    delete[] tmp;
-    return img;
+    delete[] img;
+    return new_img;
 }
 
 // Helper function for median_filter
@@ -153,7 +164,6 @@ void insertionSort(unsigned char arr[], int n)
     for (i = 1; i < n; i++) {
         key = arr[i];
         j = i - 1;
-  
         while (j >= 0 && arr[j] > key) {
             arr[j + 1] = arr[j];
             j = j - 1;
@@ -190,10 +200,8 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
             }
         }
     }
-    unsigned char *tmp = img;
-    img = new_img;
-    delete[] tmp;
-    return img;
+    delete[] img;
+    return new_img;
 }
 
 // Nonlinear filter that makes a pixel white if its not significantly darker than the mean of its surrounding pixels
@@ -235,8 +243,6 @@ unsigned char* threshold_mean(unsigned char *img, int width, int height, int rad
             }
         }
     }
-    unsigned char *tmp = img;
-    img = new_img;
-    delete[] tmp;
-    return img;
+    delete[] img;
+    return new_img;
 }
