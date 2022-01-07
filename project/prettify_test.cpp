@@ -9,7 +9,8 @@ using namespace std;
 #define MEAN_FILTER 3
 #define GAUSS_FILTER 4
 #define MEDIAN_FILTER 5
-#define THRESHOLD_MEAN 6
+#define THRESHOLD 6
+#define THRESHOLD_ADAPTIVE 7
 
 int read_image_test() {
     unsigned char *img;
@@ -124,13 +125,39 @@ int median_filter_test() {
     return 0;
 }
 
-int threshold_mean_test() {
+int threshold_test() {
     char in_filename[] = "../test/in.ppm";
-    char check_filename[] = "../test/out_threshold_mean.ppm";
+    char check_filename[] = "../test/out_threshold.ppm";
     unsigned char *img, *check;
     int width, height;
     img = read_image(in_filename, img, &width, &height);
-    img = threshold_mean(img, width, height, 4, 10);
+    img = threshold(img, width, height, 100);
+    if (img == nullptr) {
+        return 1;
+    }
+    check = read_image(check_filename, check, &width, &height);
+    if (check == nullptr) {
+        return 1;
+    }
+    for (int i=0; i < width*height*3; i++) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
+            delete[] img;
+            delete[] check;
+            return 1;
+        }
+    }
+    delete[] img;
+    delete[] check;
+    return 0;
+}
+
+int threshold_adaptive_test() {
+    char in_filename[] = "../test/in.ppm";
+    char check_filename[] = "../test/out_threshold_adaptive.ppm";
+    unsigned char *img, *check;
+    int width, height;
+    img = read_image(in_filename, img, &width, &height);
+    img = threshold_adaptive(img, width, height, 4, 10);
     if (img == nullptr) {
         return 1;
     }
@@ -171,8 +198,11 @@ int main(int argc, char* argv[]) {
         case MEDIAN_FILTER:
             return median_filter_test();
             break;
-        case THRESHOLD_MEAN:
-            return threshold_mean_test();
+        case THRESHOLD:
+            return threshold_test();
+            break;
+        case THRESHOLD_ADAPTIVE:
+            return threshold_adaptive_test();
             break;
         default:
             cerr << "Unknown test number entered." << endl;

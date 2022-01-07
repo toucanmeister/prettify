@@ -10,7 +10,8 @@ using namespace std;
 const string mean_filter_id = "mean"; // Names of the routines the user can invoke
 const string gauss_filter_id = "gauss";
 const string median_filter_id = "median";
-const string threshold_mean_id = "threshold_mean";
+const string threshold_id = "threshold";
+const string threshold_adaptive_id = "threshold_adaptive";
 
 // reads ppm p3 image at filename, returns pointer to data and width, height
 unsigned char* read_image(char filename[], unsigned char *img, int *width, int *height) {
@@ -216,10 +217,38 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
     return new_img;
 }
 
+// Nonlinear filter that makes a pixel white if it isn't darker than a specified threshold
+// thresh:  determines the threshold
+unsigned char* threshold(unsigned char *img, int width, int height, int thresh) {
+    cout << "Applying global threshold with threshold " << thresh << endl;
+
+    size_t size = width*height*3;
+    unsigned char *new_img = new unsigned char[size];
+
+    for (int p=0; p < size; p+=3) { // Go over all pixels
+        unsigned int sum = 0;
+        for (int c=0; c < 3; c++) {
+            sum += img[p+c];
+        }
+        unsigned char pixel_intensity = (unsigned char) (sum / 3);
+        if (pixel_intensity > thresh) {
+            new_img[p] = 255;
+            new_img[p+1] = 255;
+            new_img[p+2] = 255;
+        } else {
+            new_img[p] = img[p];
+            new_img[p+1] = img[p+1];
+            new_img[p+2] = img[p+2];
+        }
+    }
+    delete[] img;
+    return new_img;
+}
+
 // Nonlinear filter that makes a pixel white if its not significantly darker than the mean of its surrounding pixels
 // radius:  determines the size of the surrounding square in which the mean is calculated
 // C:       determines how much darker than the mean a pixel has to be
-unsigned char* threshold_mean(unsigned char *img, int width, int height, int radius=5, int C=10) {
+unsigned char* threshold_adaptive(unsigned char *img, int width, int height, int radius=5, int C=10) {
     if (radius > (width/2)-1 || radius > (height/2)-1) {
         cerr << "Error: Radius too large for image." << endl;
         return img;
