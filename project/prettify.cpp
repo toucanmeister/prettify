@@ -2,7 +2,6 @@
 #include <fstream>
 #include <cmath>
 #include <cstring>
-#include <omp.h>
 #include "prettify.hpp"
 
 using namespace std;
@@ -69,6 +68,10 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
         cerr << "Error: Radius too large for image." << endl;
         return img;
     }
+    if (radius < 1)  {
+        cerr << "Error: Radius has to be at least 1" << endl;
+        return img;
+    }
     cout << "Applying mean filter with radius " << radius << endl;
     size_t size = width*height*3;
     unsigned char *tmp_img = new unsigned char[size];
@@ -115,7 +118,11 @@ inline float gauss(float mu, float sigma, float x) {
 // Convolutional filter, takes the gaussian-weighted mean over a square around each pixel
 // sigma:   determines the shape of the gaussian distribution used, radius is 3*sigma
 unsigned char* gauss_filter(unsigned char *img, int width, int height, float sigma=1) {
-    int radius = 3*sigma; // this gives us 99% of the mass under the gaussian
+    if (sigma <= 0)  {
+        cerr << "Error: Sigma has to be positive" << endl;
+        return img;
+    }
+    int radius = (int) 3*sigma; // this gives us 99% of the mass under the gaussian
     if (radius > (width/2)-1 || radius > (height/2)-1) {
         cerr << "Error: Sigma too large for image." << endl;
         return img;
@@ -184,7 +191,7 @@ void insertionSort(unsigned char arr[], int n)
         arr[j + 1] = key;
     }
 }
-
+/*
 // Nonlinear filter that takes the median over a square around each pixel
 // radius:  determines the size of the surrounding square in which the mean is calculated
 unsigned char* median_filter(unsigned char *img, int width, int height, int radius=1) {
@@ -199,7 +206,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
     int n = (2*radius+1)*(2*radius+1);
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
-            for (int c=0; c < 3; c++) {
+            for (int c=0; c < 3; c++) { 
                 unsigned char arr[n] = {0};
                 for (int x=-radius; x <= radius; x++) {
                     for (int y=-radius; y <= radius; y++) {
@@ -216,6 +223,65 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
     delete[] img;
     return new_img;
 }
+*/
+
+// Nonlinear filter that takes the median over a square around each pixel
+// radius:  determines the size of the surrounding square in which the mean is calculated
+unsigned char* median_filter(unsigned char *img, int width, int height, int radius=1) {
+    if (radius > (width/2)-1 || radius > (height/2)-1) {
+        cerr << "Error: Radius too large for image." << endl;
+        return img;
+    }
+    if (radius < 1)  {
+        cerr << "Error: Radius has to be at least 1" << endl;
+        return img;
+    }
+    cout << "Applying median filter with radius " << radius << endl;
+
+    size_t size = width*height*3;
+    unsigned char *new_img = new unsigned char[size];
+    int n = (2*radius+1)*(2*radius+1);
+    int hist[256];
+    for (int c=0; c < 3; c++) {
+        for (int i=0; i < height; i++) {
+            for (int bin=0; bin < 256; bin++) { // Clear histogram
+                hist[bin] = 0;
+            }
+            for (int y=-radius; y <= radius; y++) { // Initialize first histogram
+                for (int x=0; x <= (radius-1); x++) {
+                    if (i+y < height && i+y >= 0) { // Ignore edges
+                        hist[img[(i+y)*width*3 + x*3 + c]]++;
+                    }
+                }
+            }
+            for (int j=0; j < width; j++) {
+                for (int y=-radius; y <= radius; y++) {
+                    if (i+y < height && i+y >= 0) {
+                        if (j-radius >= 0) {
+                            hist[img[(i+y)*width*3 + (j-radius)*3 + c]]--; // Remove left column of the last window from histogram
+                        }
+                        if (j+radius < width) {
+                            hist[img[(i+y)*width*3 + (j+radius)*3 + c]]++; // Add right column of new window to histogram
+                        }
+                    }
+                }
+                int count = 0;
+                int median;
+                for (int bin=0; bin < 256; bin++) { // Go through the histogram
+                    count += hist[bin]; // Adding up the number of pixels for each intensity
+                    if (count >= n/2) { // Once we have half of the pixels we found the median
+                        median = bin; 
+                        break;
+                    }
+                }
+                new_img[i*width*3 + j*3 + c] = median;
+            }
+        }
+    }
+    delete[] img;
+    return new_img;
+}
+
 
 // Nonlinear filter that makes a pixel white if it isn't darker than a specified threshold
 // thresh:  determines the threshold

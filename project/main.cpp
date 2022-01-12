@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <omp.h>
 
 #include "prettify.hpp"
 
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]) {
         cerr << "Error: could not read " << in_filename << endl;
         return 1;
     }
-
+    auto start = omp_get_wtime();
     for (int i=3; i < argc; i++) {
         if (mean_filter_id.compare(argv[i]) == 0) {
             int radius = 1;
@@ -137,6 +138,8 @@ int main(int argc, char *argv[]) {
             return 0;
         }
     }
+    auto end = omp_get_wtime();
+    cout << "Took " << end-start << " seconds" << endl;
     write_image(out_filename, img, width, height);
     delete[] img;
     return 0;
