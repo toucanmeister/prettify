@@ -191,39 +191,7 @@ void insertionSort(unsigned char arr[], int n)
         arr[j + 1] = key;
     }
 }
-/*
-// Nonlinear filter that takes the median over a square around each pixel
-// radius:  determines the size of the surrounding square in which the mean is calculated
-unsigned char* median_filter(unsigned char *img, int width, int height, int radius=1) {
-    if (radius > (width/2)-1 || radius > (height/2)-1) {
-        cerr << "Error: Radius too large for image." << endl;
-        return img;
-    }
-    cout << "Applying median filter with radius " << radius << endl;
 
-    size_t size = width*height*3;
-    unsigned char *new_img = new unsigned char[size];
-    int n = (2*radius+1)*(2*radius+1);
-    for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j++) {
-            for (int c=0; c < 3; c++) { 
-                unsigned char arr[n] = {0};
-                for (int x=-radius; x <= radius; x++) {
-                    for (int y=-radius; y <= radius; y++) {
-                        if (i+x < height && i+x >= 0 && j+y < width && j+y >= 0) { 
-                            arr[(x+radius)*(2*radius+1) + (y+radius)] = img[(i+x)*width*3 + (j+y)*3 + c];
-                        }
-                    }
-                }
-                insertionSort(arr, n);
-                new_img[i*width*3 + j*3 + c] =  arr[n/2];
-            }
-        }
-    }
-    delete[] img;
-    return new_img;
-}
-*/
 
 // Nonlinear filter that takes the median over a square around each pixel
 // radius:  determines the size of the surrounding square in which the mean is calculated
@@ -254,24 +222,46 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                     }
                 }
             }
-            for (int j=0; j < width; j++) {
-                for (int y=-radius; y <= radius; y++) {
-                    if (i+y < height && i+y >= 0) {
-                        if (j-radius >= 0) {
-                            hist[img[(i+y)*width*3 + (j-radius)*3 + c]]--; // Remove left column of the last window from histogram
-                        }
-                        if (j+radius < width) {
-                            hist[img[(i+y)*width*3 + (j+radius)*3 + c]]++; // Add right column of new window to histogram
+            int median = 0;
+            int pxls_below_median = 0;
+            for (int j=0; j < width; j++) { // Going over the pixels in one row
+                if (j-radius-1 >= 0) {
+                    for (int y=-radius; y <= radius; y++) {
+                        if (i+y < height && i+y >= 0) {
+                            int val = img[(i+y)*width*3 + (j-radius-1)*3 + c]; // Take the left column of the last window
+                            hist[val]--; // and remove it from the histogram
+                            if (val < median) {
+                                pxls_below_median--;
+                            }
                         }
                     }
                 }
-                int count = 0;
-                int median;
-                for (int bin=0; bin < 256; bin++) { // Go through the histogram
-                    count += hist[bin]; // Adding up the number of pixels for each intensity
-                    if (count >= n/2) { // Once we have half of the pixels we found the median
-                        median = bin; 
-                        break;
+                if (j+radius < width) {
+                    for (int y=-radius; y <= radius; y++) {
+                        if (i+y < height && i+y >= 0) {
+                            int val = img[(i+y)*width*3 + (j+radius)*3 + c]; // Take the right column of the current window
+                            hist[val]++; // and add it to the histogram
+                            if (val < median) {
+                                pxls_below_median++;
+                            }
+                        }
+                    }
+                }
+                if (pxls_below_median > n/2)  { // Median in this window is smaller than in the last
+                    for (int bin=median-1; bin > 0; bin--) { // Go through the histogram
+                        pxls_below_median -= hist[bin]; // Subtracting the number of pixels of each bin
+                        if (pxls_below_median <= n/2) { // Until half the pixels are below the current bin
+                            median = bin; // Then that bin is the median
+                            break;
+                        }
+                    }
+                } else { // Median in this window is greater than in the last
+                    for (int bin=median; bin < 256; bin++) { // Go through the histogram
+                        if (pxls_below_median > n/2) { // Until half the pixels are below the current bin
+                            median = bin; // Then that bin is the median
+                            break;
+                        }
+                        pxls_below_median += hist[bin]; // Adding the number of pixels of each bin
                     }
                 }
                 new_img[i*width*3 + j*3 + c] = median;
