@@ -72,7 +72,6 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
         cerr << "Error: Radius has to be at least 1" << endl;
         return img;
     }
-    cout << "Applying mean filter with radius " << radius << endl;
     size_t size = width*height*3;
     unsigned char *tmp_img = new unsigned char[size];
 
@@ -131,8 +130,6 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
         cerr << "Error: Sigma has to be positive." << endl;
         return img;
     }
-    cout << "Applying gauss filter with sigma " << sigma << endl;
-
     float kernel[2*radius+1];
     float weight = 0;
     for (int x=-radius; x <= radius; x++) { // Initialize a 1d-kernel of normally distributed weights
@@ -176,22 +173,6 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
     return new_img;
 }
 
-// Helper function for median_filter
-void insertionSort(unsigned char arr[], int n)
-{
-    int i, j;
-    unsigned char key;
-    for (i = 1; i < n; i++) {
-        key = arr[i];
-        j = i - 1;
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j = j - 1;
-        }
-        arr[j + 1] = key;
-    }
-}
-
 
 // Nonlinear filter that takes the median over a square around each pixel
 // radius:  determines the size of the surrounding square in which the mean is calculated
@@ -204,7 +185,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
         cerr << "Error: Radius has to be at least 1" << endl;
         return img;
     }
-    cout << "Applying median filter with radius " << radius << endl;
+    
 
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
@@ -276,8 +257,6 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
 // Nonlinear filter that makes a pixel white if it isn't darker than a specified threshold
 // thresh:  determines the threshold
 unsigned char* threshold(unsigned char *img, int width, int height, int thresh) {
-    cout << "Applying global threshold with threshold " << thresh << endl;
-
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
 
@@ -301,6 +280,7 @@ unsigned char* threshold(unsigned char *img, int width, int height, int thresh) 
     return new_img;
 }
 
+
 // Nonlinear filter that makes a pixel white if its not significantly darker than the mean of its surrounding pixels
 // radius:  determines the size of the surrounding square in which the mean is calculated
 // C:       determines how much darker than the mean a pixel has to be
@@ -309,37 +289,30 @@ unsigned char* threshold_adaptive(unsigned char *img, int width, int height, int
         cerr << "Error: Radius too large for image." << endl;
         return img;
     }
-    cout << "Applying adaptive mean threshold with radius " << radius << " and C " << C << endl;
 
     size_t size = width*height*3;
+    unsigned char *copy = new unsigned char[size];
+    unsigned char *tmp = new unsigned char[size];
+    memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
+    tmp = mean_filter(img, width, height, radius); // Compute means
     unsigned char *new_img = new unsigned char[size];
-
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
-            unsigned int sum = 0;
-            for (int x=-radius; x <= radius; x++) {
-                for (int y=-radius; y <= radius; y++) {
-                    for (int c=0; c < 3; c++) {
-                        if (i+x < height && i+x >= 0 && j+y < width && j+y >= 0) {
-                            sum += img[(i+x)*width*3 + (j+y)*3 + c];
-                        }
-                    }
-                }
-            }
-            unsigned char mean = (unsigned char) (sum / ((radius*2+1) * (radius*2+1) * 3));
             unsigned int pixel = i*width*3 + j*3;
-            unsigned char pixel_intensity = (img[pixel] + img[pixel+1] + img[pixel+2]) / 3;
-            if (pixel_intensity > mean-C) {
+            unsigned char mean_intensity = (tmp[pixel] + tmp[pixel+1] + tmp[pixel+2]) / 3;
+            unsigned char pixel_intensity = (copy[pixel] + copy[pixel+1] + copy[pixel+2]) / 3;
+            if (pixel_intensity > mean_intensity-C) {
                 new_img[pixel] = 255;
                 new_img[pixel+1] = 255;
                 new_img[pixel+2] = 255;
             } else {
-                new_img[pixel] = img[pixel];
-                new_img[pixel+1] = img[pixel+1];
-                new_img[pixel+2] = img[pixel+2];
+                new_img[pixel] = copy[pixel];
+                new_img[pixel+1] = copy[pixel+1];
+                new_img[pixel+2] = copy[pixel+2];
             }
         }
     }
-    delete[] img;
+    delete[] copy;
+    delete[] tmp;
     return new_img;
 }

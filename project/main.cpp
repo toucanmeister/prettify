@@ -98,6 +98,7 @@ int main(int argc, char *argv[]) {
                 radius = atoi(argv[i+1]);
                 i++; // Next argument was the radius -> skip next iteration
             }
+            cout << "Applying mean filter with radius " << radius << endl;
             img = mean_filter(img, width, height, radius);
         } else if (gauss_filter_id.compare(argv[i]) == 0) {
             int sigma = 1;
@@ -105,6 +106,7 @@ int main(int argc, char *argv[]) {
                 sigma = atoi(argv[i+1]);
                 i++;
             }
+            cout << "Applying gauss filter with sigma " << sigma << endl;
             img = gauss_filter(img, width, height, sigma);
         } else if (median_filter_id.compare(argv[i]) == 0) {
             int radius = 1;
@@ -112,6 +114,7 @@ int main(int argc, char *argv[]) {
                 radius = atoi(argv[i+1]);
                 i++;
             }
+            cout << "Applying median filter with radius " << radius << endl;
             img = median_filter(img, width, height, radius);
         } else if (threshold_id.compare(argv[i]) == 0){
             int thresh = 100;
@@ -119,6 +122,7 @@ int main(int argc, char *argv[]) {
                 thresh = atoi(argv[i+1]);
                 i++;
             }
+            cout << "Applying global threshold with threshold " << thresh << endl;
             img = threshold(img, width, height, thresh);
         } else if (threshold_adaptive_id.compare(argv[i]) == 0) {
             int radius = 5;
@@ -131,6 +135,7 @@ int main(int argc, char *argv[]) {
                     i++;
                 }
             }
+            cout << "Applying adaptive mean threshold with radius " << radius << " and C " << C << endl;
             img = threshold_adaptive(img, width, height, radius, C);
         } else {
             print_usage(argv[0]);
