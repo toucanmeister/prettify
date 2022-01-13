@@ -12,6 +12,10 @@ const string median_filter_id = "median";
 const string threshold_id = "threshold";
 const string threshold_adaptive_id = "threshold_adaptive";
 
+inline unsigned int pxl(int width, int height, int row, int column) { // Translates pixel coordinates from 2d to 1d
+    return row*width*3 + column*3; // We go i rows down, and j pixels to the right, times three for rgb channels
+}
+
 // reads ppm p3 image at filename, returns pointer to data and width, height
 unsigned char* read_image(char filename[], unsigned char *img, int *width, int *height) {
     ifstream img_file;
@@ -52,7 +56,7 @@ void write_image(char filename[], unsigned char *img, int width, int height) {
     for (int i=0; i < height; i++) { // Over all rows
         for (int j=0; j < width; j++) { // Over pixels in a row
             for (int c=0; c < 3; c++) { // Over rgb channels
-                currentVal = (unsigned) img[i*width*3 + j*3 + c]; // We go i rows down, and j pixels to the right, times three for rgb channels
+                currentVal = (unsigned) img[pxl(width, height, i, j) + c];
                 img_file << currentVal << " ";
             }
         }
@@ -81,10 +85,10 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
                 unsigned int sum = 0;
                 for (int x=-radius; x <= radius; x++) {
                     if (j+x < width && j+x >= 0) { // Edge cases are ignored, with large radii this causes shadows
-                        sum += img[i*width*3 + (j+x)*3 + c];
+                        sum += img[pxl(width, height, i, j+x) + c];
                     }
                 }
-                tmp_img[i*width*3 + j*3 + c] = (unsigned char) (sum / (radius*2+1));
+                tmp_img[pxl(width, height, i, j) + c] = (unsigned char) (sum / (radius*2+1));
             }
         }
     }
@@ -96,10 +100,10 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
                 unsigned int sum = 0;
                 for (int y=-radius; y <= radius; y++) {
                     if (i+y < height && i+y >= 0) {
-                        sum += tmp_img[(i+y)*width*3 + j*3 + c];
+                        sum += tmp_img[pxl(width, height, i+y, j) + c];
                     }
                 }
-                new_img[i*width*3 + j*3 + c] = (unsigned char) (sum / (radius*2+1));
+                new_img[pxl(width, height, i, j) + c] = (unsigned char) (sum / (radius*2+1));
             }
         }
     }
@@ -146,10 +150,10 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
                 unsigned int sum = 0;
                 for (int x=-radius; x <= radius; x++) {
                     if (j+x < width && j+x >= 0) { // Edge cases are ignored, with large radii this causes shadows
-                        sum += img[i*width*3 + (j+x)*3 + c] * kernel[x+radius];
+                        sum += img[pxl(width, height, i, j+x) + c] * kernel[x+radius];
                     }
                 }
-                tmp_img[i*width*3 + j*3 + c] = (unsigned char) (sum / weight);
+                tmp_img[pxl(width, height, i, j) + c] = (unsigned char) (sum / weight);
             }
         }
     }
@@ -161,10 +165,10 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, float sig
                 unsigned int sum = 0;
                 for (int y=-radius; y <= radius; y++) {
                     if (i+y < height && i+y >= 0) {
-                        sum += tmp_img[(i+y)*width*3 + j*3 + c] * kernel[y+radius];
+                        sum += tmp_img[pxl(width, height, i+y, j) + c] * kernel[y+radius];
                     }
                 }
-                new_img[i*width*3 + j*3 + c] = (unsigned char) (sum / weight);
+                new_img[pxl(width, height, i, j) + c] = (unsigned char) (sum / weight);
             }
         }
     }
@@ -199,7 +203,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
             for (int y=-radius; y <= radius; y++) { // Initialize first histogram
                 for (int x=0; x <= (radius-1); x++) {
                     if (i+y < height && i+y >= 0) { // Ignore edges
-                        hist[img[(i+y)*width*3 + x*3 + c]]++;
+                        hist[img[pxl(width, height, i+y, x) + c]]++;
                     }
                 }
             }
@@ -209,7 +213,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                 if (j-radius-1 >= 0) {
                     for (int y=-radius; y <= radius; y++) {
                         if (i+y < height && i+y >= 0) {
-                            int val = img[(i+y)*width*3 + (j-radius-1)*3 + c]; // Take the left column of the last window
+                            int val = img[pxl(width, height, i+y, j-radius-1) + c]; // Take the left column of the last window
                             hist[val]--; // and remove it from the histogram
                             if (val < median) {
                                 pxls_below_median--;
@@ -220,7 +224,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                 if (j+radius < width) {
                     for (int y=-radius; y <= radius; y++) {
                         if (i+y < height && i+y >= 0) {
-                            int val = img[(i+y)*width*3 + (j+radius)*3 + c]; // Take the right column of the current window
+                            int val = img[pxl(width, height, i+y, j+radius) + c]; // Take the right column of the current window
                             hist[val]++; // and add it to the histogram
                             if (val < median) {
                                 pxls_below_median++;
@@ -245,7 +249,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                         pxls_below_median += hist[bin]; // Adding the number of pixels of each bin
                     }
                 }
-                new_img[i*width*3 + j*3 + c] = median;
+                new_img[pxl(width, height, i, j) + c] = median;
             }
         }
     }
@@ -296,9 +300,10 @@ unsigned char* threshold_adaptive(unsigned char *img, int width, int height, int
     memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
     tmp = mean_filter(img, width, height, radius); // Compute means
     unsigned char *new_img = new unsigned char[size];
+    
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
-            unsigned int pixel = i*width*3 + j*3;
+            unsigned int pixel = pxl(width, height, i, j);
             unsigned char mean_intensity = (tmp[pixel] + tmp[pixel+1] + tmp[pixel+2]) / 3;
             unsigned char pixel_intensity = (copy[pixel] + copy[pixel+1] + copy[pixel+2]) / 3;
             if (pixel_intensity > mean_intensity-C) {
