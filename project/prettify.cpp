@@ -10,7 +10,8 @@ const string mean_filter_id = "mean"; // Names of the routines the user can invo
 const string gauss_filter_id = "gauss";
 const string median_filter_id = "median";
 const string threshold_id = "threshold";
-const string threshold_adaptive_id = "threshold_adaptive";
+const string threshold_adaptive_mean_id = "threshold_mean";
+const string threshold_adaptive_gauss_id = "threshold_gauss";
 
 inline unsigned int pxl(int width, int height, int row, int column) { // Translates pixel coordinates from 2d to 1d
     return row*width*3 + column*3; // We go i rows down, and j pixels to the right, times three for rgb channels
@@ -73,7 +74,7 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
         return img;
     }
     if (radius < 1)  {
-        cerr << "Error: Radius has to be at least 1" << endl;
+        cerr << "Error: Radius has to be at least 1." << endl;
         return img;
     }
     size_t size = width*height*3;
@@ -119,21 +120,17 @@ inline float gauss(float mu, float sigma, float x) {
 }
 
 // Convolutional filter, takes the gaussian-weighted mean over a square around each pixel
-// sigma:   determines the shape of the gaussian distribution used, radius is 3*sigma
-unsigned char* gauss_filter(unsigned char *img, int width, int height, float sigma=1) {
-    if (sigma <= 0)  {
-        cerr << "Error: Sigma has to be positive" << endl;
+// radius:   determines the size of the surrounding square in which the weighted mean is calculated
+unsigned char* gauss_filter(unsigned char *img, int width, int height, int radius=1) {
+    if (radius < 1)  {
+        cerr << "Error: Radius has to be at least 1." << endl;
         return img;
     }
-    int radius = (int) 3*sigma; // this gives us 99% of the mass under the gaussian
     if (radius > (width/2)-1 || radius > (height/2)-1) {
-        cerr << "Error: Sigma too large for image." << endl;
+        cerr << "Error: Radius too large for image." << endl;
         return img;
     }
-    if (sigma < 0) {
-        cerr << "Error: Sigma has to be positive." << endl;
-        return img;
-    }
+    float sigma = ((float) radius) / 3.0; // this gives us 99% of the mass under the gaussian
     float kernel[2*radius+1];
     float weight = 0;
     for (int x=-radius; x <= radius; x++) { // Initialize a 1d-kernel of normally distributed weights
@@ -186,7 +183,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
         return img;
     }
     if (radius < 1)  {
-        cerr << "Error: Radius has to be at least 1" << endl;
+        cerr << "Error: Radius has to be at least 1." << endl;
         return img;
     }
     
@@ -288,7 +285,11 @@ unsigned char* threshold(unsigned char *img, int width, int height, int thresh) 
 // Nonlinear filter that makes a pixel white if its not significantly darker than the mean of its surrounding pixels
 // radius:  determines the size of the surrounding square in which the mean is calculated
 // C:       determines how much darker than the mean a pixel has to be
-unsigned char* threshold_adaptive(unsigned char *img, int width, int height, int radius=5, int C=10) {
+unsigned char* threshold_adaptive_mean(unsigned char *img, int width, int height, int radius=5, int C=10) {
+    if (radius < 1) {
+        cerr << "Error: Radius has to be at least 1" << endl;
+        return img;
+    }
     if (radius > (width/2)-1 || radius > (height/2)-1) {
         cerr << "Error: Radius too large for image." << endl;
         return img;
@@ -298,7 +299,48 @@ unsigned char* threshold_adaptive(unsigned char *img, int width, int height, int
     unsigned char *copy = new unsigned char[size];
     unsigned char *tmp = new unsigned char[size];
     memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
-    tmp = mean_filter(img, width, height, radius); // Compute means
+    tmp = mean_filter(img, width, height, radius); // Compute mean for each pixel
+    unsigned char *new_img = new unsigned char[size];
+    
+    for (int i=0; i < height; i++) {
+        for (int j=0; j < width; j++) {
+            unsigned int pixel = pxl(width, height, i, j);
+            unsigned char mean_intensity = (tmp[pixel] + tmp[pixel+1] + tmp[pixel+2]) / 3;
+            unsigned char pixel_intensity = (copy[pixel] + copy[pixel+1] + copy[pixel+2]) / 3;
+            if (pixel_intensity > mean_intensity-C) {
+                new_img[pixel] = 255;
+                new_img[pixel+1] = 255;
+                new_img[pixel+2] = 255;
+            } else {
+                new_img[pixel] = copy[pixel];
+                new_img[pixel+1] = copy[pixel+1];
+                new_img[pixel+2] = copy[pixel+2];
+            }
+        }
+    }
+    delete[] copy;
+    delete[] tmp;
+    return new_img;
+}
+
+// Nonlinear filter that makes a pixel white if its not significantly darker than the gaussian-weighted mean of its surrounding pixels
+// radius:  determines the size of the surrounding square in which the mean is calculated
+// C:       determines how much darker than the mean a pixel has to be
+unsigned char* threshold_adaptive_gauss(unsigned char *img, int width, int height, int radius=5, int C=10) {
+    if (radius < 1)  {
+        cerr << "Error: Radius has to be at least 1." << endl;
+        return img;
+    }
+    if (radius > (width/2)-1 || radius > (height/2)-1) {
+        cerr << "Error: Radius too large for image." << endl;
+        return img;
+    }
+
+    size_t size = width*height*3;
+    unsigned char *copy = new unsigned char[size];
+    unsigned char *tmp = new unsigned char[size];
+    memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
+    tmp = gauss_filter(img, width, height, radius); // Compute gaussian-weighted mean for each pixel
     unsigned char *new_img = new unsigned char[size];
     
     for (int i=0; i < height; i++) {

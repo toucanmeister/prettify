@@ -10,7 +10,8 @@ using namespace std;
 #define GAUSS_FILTER 4
 #define MEDIAN_FILTER 5
 #define THRESHOLD 6
-#define THRESHOLD_ADAPTIVE 7
+#define THRESHOLD_ADAPTIVE_MEAN 7
+#define THRESHOLD_ADAPTIVE_GAUSS 8
 
 int read_image_test() {
     unsigned char *img;
@@ -151,13 +152,39 @@ int threshold_test() {
     return 0;
 }
 
-int threshold_adaptive_test() {
+int threshold_adaptive_mean_test() {
     char in_filename[] = "../test/in.ppm";
-    char check_filename[] = "../test/out_threshold_adaptive.ppm";
+    char check_filename[] = "../test/out_threshold_adaptive_mean.ppm";
     unsigned char *img, *check;
     int width, height;
     img = read_image(in_filename, img, &width, &height);
-    img = threshold_adaptive(img, width, height, 4, 10);
+    img = threshold_adaptive_mean(img, width, height, 4, 10);
+    if (img == nullptr) {
+        return 1;
+    }
+    check = read_image(check_filename, check, &width, &height);
+    if (check == nullptr) {
+        return 1;
+    }
+    for (int i=0; i < width*height*3; i++) {
+        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
+            delete[] img;
+            delete[] check;
+            return 1;
+        }
+    }
+    delete[] img;
+    delete[] check;
+    return 0;
+}
+
+int threshold_adaptive_gauss_test() {
+    char in_filename[] = "../test/in.ppm";
+    char check_filename[] = "../test/out_threshold_adaptive_gauss.ppm";
+    unsigned char *img, *check;
+    int width, height;
+    img = read_image(in_filename, img, &width, &height);
+    img = threshold_adaptive_gauss(img, width, height, 4, 10);
     if (img == nullptr) {
         return 1;
     }
@@ -201,8 +228,11 @@ int main(int argc, char* argv[]) {
         case THRESHOLD:
             return threshold_test();
             break;
-        case THRESHOLD_ADAPTIVE:
-            return threshold_adaptive_test();
+        case THRESHOLD_ADAPTIVE_MEAN:
+            return threshold_adaptive_mean_test();
+            break;
+        case THRESHOLD_ADAPTIVE_GAUSS:
+            return threshold_adaptive_gauss_test();
             break;
         default:
             cerr << "Unknown test number entered." << endl;

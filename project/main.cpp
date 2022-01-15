@@ -19,10 +19,11 @@ int handle_help(int argc, char *argv[]) {
         cout << " input_file and output_file need to be P3 (ASCII-encoded) portable pix map (.ppm) files without comments." << endl;
         cout << " The specified [routines] will operate on the image and may be any (even multiple) of the following, in any order: " << endl;
         cout << "   " << mean_filter_id << " [radius]" << endl 
-             << "   " << gauss_filter_id << " [sigma]" << endl 
+             << "   " << gauss_filter_id << " [radius]" << endl 
              << "   " << median_filter_id << " [radius]" << endl
              << "   " << threshold_id << " [threshold]" << endl
-             << "   " << threshold_adaptive_id << " [radius [C]]" << endl;
+             << "   " << threshold_adaptive_mean_id << " [radius [C]]" << endl
+             << "   " << threshold_adaptive_gauss_id << " [radius [C]]" << endl;
         cout << "Try \"" << argv[0] << " -h routine\" for information on a specific routine" << endl; 
         return 1;
     }
@@ -35,8 +36,8 @@ int handle_help(int argc, char *argv[]) {
         } else if (gauss_filter_id.compare(argv[2]) == 0) {
             cout << "Convolutional filter, replaces each pixel with the gaussian-weighted mean computed over a square around it." << endl
                  << "Used to remove ISO-noise and speckle noise, also slightly smoothes edges." << endl
-                 << "Usage: " << argv[0] << " input_file output_file " << gauss_filter_id << " [sigma]" << endl
-                 << "  sigma:  Determines the shape of the gaussian distribution used, radius is 3*sigma." << endl;
+                 << "Usage: " << argv[0] << " input_file output_file " << gauss_filter_id << " [radius]" << endl
+                 << "  radius:  Determines the size of the surrounding square in which the weighted mean is calculated." << endl;
         } else if (median_filter_id.compare(argv[2]) == 0) {
             cout << "Nonlinear filter, replaces each pixel with the median computed over a square around it." << endl
                  << "Used to remove ISO-noise, speckle noise and salt-and-pepper noise, also slightly smoothes edges." << endl
@@ -47,11 +48,17 @@ int handle_help(int argc, char *argv[]) {
                  << "Used to remove image background, especially shadows. Only works when background is cleanly separable by its brightness." << endl
                  << "Usage: " << argv[0] << " input_file output_file " << threshold_id << " [threshold]" << endl
                  << "  thresh:  Determines the threshold." << endl;
-        } else if (threshold_adaptive_id.compare(argv[2]) == 0) {
+        } else if (threshold_adaptive_mean_id.compare(argv[2]) == 0) {
             cout << "Nonlinear filter that makes a pixel white if its not significantly darker than the mean of its surrounding pixels." << endl
                  << "Used to remove image background, especially shadows. Only works with pure text document images." << endl
-                 << "Usage: " << argv[0] << " input_file output_file " << threshold_adaptive_id << " [radius [C]]" << endl
+                 << "Usage: " << argv[0] << " input_file output_file " << threshold_adaptive_mean_id << " [radius [C]]" << endl
                  << "  radius:  Determines the size of the surrounding square in which the mean is calculated." << endl
+                 << "  C:       Determines how much darker than the mean a pixel has to be." << endl;
+        } else if (threshold_adaptive_gauss_id.compare(argv[2]) == 0) {
+            cout << "Nonlinear filter that makes a pixel white if its not significantly darker than the gaussian-weighted mean of its surrounding pixels." << endl
+                 << "Used to remove image background, especially shadows. Only works with pure text document images.\nSometimes creates less noise than an adaptive mean threshold." << endl
+                 << "Usage: " << argv[0] << " input_file output_file " << threshold_adaptive_gauss_id << " [radius [C]]" << endl
+                 << "  radius:  Determines the size of the surrounding square in which the weighted mean is calculated." << endl
                  << "  C:       Determines how much darker than the mean a pixel has to be." << endl;
         } else {
             cout << "Either use -h or --help without further arguments or specify exactly one of the routines: " << endl;
@@ -59,7 +66,8 @@ int handle_help(int argc, char *argv[]) {
              << "   " << gauss_filter_id << endl 
              << "   " << median_filter_id << endl
              << "   " << threshold_id << endl
-             << "   " << threshold_adaptive_id << endl;
+             << "   " << threshold_adaptive_mean_id << endl
+             << "   " << threshold_adaptive_gauss_id << endl;
         }
         return 1;
     }
@@ -101,13 +109,13 @@ int main(int argc, char *argv[]) {
             cout << "Applying mean filter with radius " << radius << endl;
             img = mean_filter(img, width, height, radius);
         } else if (gauss_filter_id.compare(argv[i]) == 0) {
-            int sigma = 1;
+            int radius = 1;
             if (i+1 < argc && atoi(argv[i+1])) {
-                sigma = atoi(argv[i+1]);
+                radius = atoi(argv[i+1]);
                 i++;
             }
-            cout << "Applying gauss filter with sigma " << sigma << endl;
-            img = gauss_filter(img, width, height, sigma);
+            cout << "Applying gauss filter with radius " << radius << endl;
+            img = gauss_filter(img, width, height, radius);
         } else if (median_filter_id.compare(argv[i]) == 0) {
             int radius = 1;
             if (i+1 < argc && atoi(argv[i+1])) {
@@ -124,7 +132,7 @@ int main(int argc, char *argv[]) {
             }
             cout << "Applying global threshold with threshold " << thresh << endl;
             img = threshold(img, width, height, thresh);
-        } else if (threshold_adaptive_id.compare(argv[i]) == 0) {
+        } else if (threshold_adaptive_mean_id.compare(argv[i]) == 0) {
             int radius = 5;
             int C = 10;
             if (i+1 < argc && atoi(argv[i+1])) {
@@ -136,8 +144,22 @@ int main(int argc, char *argv[]) {
                 }
             }
             cout << "Applying adaptive mean threshold with radius " << radius << " and C " << C << endl;
-            img = threshold_adaptive(img, width, height, radius, C);
+            img = threshold_adaptive_mean(img, width, height, radius, C);
+        } else if (threshold_adaptive_gauss_id.compare(argv[i]) == 0) {
+            int radius = 5;
+            int C = 10;
+            if (i+1 < argc && atoi(argv[i+1])) {
+                radius = atoi(argv[i+1]);
+                i++;
+                if (i+1 < argc && atoi(argv[i+1])) {
+                    C = atoi(argv[i+1]);
+                    i++;
+                }
+            }
+            cout << "Applying adaptive gauss threshold with radius " << radius << " and C " << C << endl;
+            img = threshold_adaptive_gauss(img, width, height, radius, C);
         } else {
+            cout << "Could not understand the following argument: " << argv[i] << endl;
             print_usage(argv[0]);
             delete[] img;
             return 0;
