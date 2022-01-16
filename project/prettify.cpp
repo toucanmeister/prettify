@@ -80,6 +80,7 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
     size_t size = width*height*3;
     unsigned char *tmp_img = new unsigned char[size];
 
+#pragma omp parallel for
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
@@ -95,6 +96,7 @@ unsigned char* mean_filter(unsigned char *img, int width, int height, int radius
     }
     unsigned char *new_img = new unsigned char[size];
 
+#pragma omp parallel for
     for (int j=0; j < width; j++) {
         for (int i=0; i < height; i++) {
             for (int c=0; c < 3; c++) {
@@ -141,6 +143,7 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, int radiu
     size_t size = width*height*3;
     unsigned char *tmp_img = new unsigned char[size];
     
+#pragma omp parallel for
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             for (int c=0; c < 3; c++) {
@@ -156,6 +159,7 @@ unsigned char* gauss_filter(unsigned char *img, int width, int height, int radiu
     }
     unsigned char *new_img = new unsigned char[size];
 
+#pragma omp parallel for
     for (int j=0; j < width; j++) {
         for (int i=0; i < height; i++) {
             for (int c=0; c < 3; c++) {
@@ -191,12 +195,10 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
     int n = (2*radius+1)*(2*radius+1);
-    int hist[256];
+#pragma omp parallel for collapse (2)
     for (int c=0; c < 3; c++) {
         for (int i=0; i < height; i++) {
-            for (int bin=0; bin < 256; bin++) { // Clear histogram
-                hist[bin] = 0;
-            }
+            int hist[256] = {0};
             for (int y=-radius; y <= radius; y++) { // Initialize first histogram
                 for (int x=0; x <= (radius-1); x++) {
                     if (i+y < height && i+y >= 0) { // Ignore edges
@@ -261,6 +263,7 @@ unsigned char* threshold(unsigned char *img, int width, int height, int thresh) 
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
 
+#pragma omp parallel for
     for (int p=0; p < size; p+=3) { // Go over all pixels
         unsigned int sum = 0;
         for (int c=0; c < 3; c++) {
@@ -301,7 +304,8 @@ unsigned char* threshold_adaptive_mean(unsigned char *img, int width, int height
     memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
     tmp = mean_filter(img, width, height, radius); // Compute mean for each pixel
     unsigned char *new_img = new unsigned char[size];
-    
+
+#pragma omp parallel for
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             unsigned int pixel = pxl(width, height, i, j);
@@ -342,7 +346,8 @@ unsigned char* threshold_adaptive_gauss(unsigned char *img, int width, int heigh
     memcpy(copy, img, size); // Need both img and temp later, but mean_filter deletes img, so we copy
     tmp = gauss_filter(img, width, height, radius); // Compute gaussian-weighted mean for each pixel
     unsigned char *new_img = new unsigned char[size];
-    
+
+#pragma omp parallel for
     for (int i=0; i < height; i++) {
         for (int j=0; j < width; j++) {
             unsigned int pixel = pxl(width, height, i, j);
