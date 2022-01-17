@@ -27,7 +27,7 @@ int handle_help(int argc, char *argv[]) {
         cout << "Try \"" << argv[0] << " -h routine\" for information on a specific routine" << endl; 
         return 1;
     }
-    if ((strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")==0)) {
+    if (argc > 1 && (strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")==0)) {
         if (mean_filter_id.compare(argv[2]) == 0) {
             cout << "Convolutional filter, replaces each pixel with the mean computed over a square around it." << endl
                  << "Used to remove ISO-noise and speckle noise, also smoothes edges; might cause high-frequency artifacts."  << endl
