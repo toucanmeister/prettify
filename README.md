@@ -19,7 +19,7 @@ Prettify is a simple command-line based scanned document enhancer.
 Prettify works with **P3** (ASCII-encoded) portable pix map (**.ppm**) images. To convert to and from this format, I recommend IrfanView or `convert` on Linux.
 
 Prettify brings 6 routines to edit images you give it:
-- **Mean Filter**: Removes ISO and speckle noise, but blurrs some edges with high radii
+- **Mean Filter**: Removes gausssian noise, but blurrs some edges with high radii
 - **Gauss Filter**: Does the same thing as the mean filter but does not create high-frequency artifacts; is a bit slower
 - **Median Filter**: Removes noise, especially salt-and-pepper noise, without blurring as much as mean or gauss filter
 - **Global Threshold**: Removes backgrounds in images with clear brightness separation between fore- and background

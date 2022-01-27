@@ -190,7 +190,6 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
         cerr << "Error: Radius has to be at least 1." << endl;
         return img;
     }
-    
 
     size_t size = width*height*3;
     unsigned char *new_img = new unsigned char[size];
@@ -200,8 +199,8 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
         for (int i=0; i < height; i++) {
             int hist[256] = {0};
             for (int y=-radius; y <= radius; y++) { // Initialize first histogram
-                for (int x=0; x <= (radius-1); x++) {
-                    if (i+y < height && i+y >= 0) { // Ignore edges
+                for (int x=0; x <= (radius-1); x++) { // The column x=radius will get filled in the first iteration, so we don't touch it here
+                    if (i+y < height && i+y >= 0) { // Ignore edges (happens in the first few and last few rows)
                         hist[img[pxl(width, height, i+y, x) + c]]++;
                     }
                 }
@@ -209,7 +208,8 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
             int median = 0;
             int pxls_below_median = 0;
             for (int j=0; j < width; j++) { // Going over the pixels in one row
-                if (j-radius-1 >= 0) {
+                // UPDATE HISTOGRAM:
+                if (j-radius-1 >= 0) { // Make sure we're not in an edge case
                     for (int y=-radius; y <= radius; y++) {
                         if (i+y < height && i+y >= 0) {
                             int val = img[pxl(width, height, i+y, j-radius-1) + c]; // Take the left column of the last window
@@ -220,7 +220,7 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                         }
                     }
                 }
-                if (j+radius < width) {
+                if (j+radius < width) { // Make sure we're not in an edge case
                     for (int y=-radius; y <= radius; y++) {
                         if (i+y < height && i+y >= 0) {
                             int val = img[pxl(width, height, i+y, j+radius) + c]; // Take the right column of the current window
@@ -231,8 +231,9 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                         }
                     }
                 }
+                // COMPUTE MEDIAN FROM HISTOGRAM:
                 if (pxls_below_median > n/2)  { // Median in this window is smaller than in the last
-                    for (int bin=median-1; bin > 0; bin--) { // Go through the histogram
+                    for (int bin=median-1; bin > 0; bin--) { // Go down through the histogram
                         pxls_below_median -= hist[bin]; // Subtracting the number of pixels of each bin
                         if (pxls_below_median <= n/2) { // Until half the pixels are below the current bin
                             median = bin; // Then that bin is the median
@@ -240,13 +241,12 @@ unsigned char* median_filter(unsigned char *img, int width, int height, int radi
                         }
                     }
                 } else { // Median in this window is greater than in the last
-                    for (int bin=median; bin < 256; bin++) { // Go through the histogram
-                        if (pxls_below_median > n/2) { // Until half the pixels are below the current bin
-                            median = bin; // Then that bin is the median
-                            break;
-                        }
+                    int bin = median;
+                    while (pxls_below_median + hist[bin] <= n/2) { // Until half the pixels are below the current bin, we go up through the histogram
                         pxls_below_median += hist[bin]; // Adding the number of pixels of each bin
+                        bin++;
                     }
+                    median = bin;
                 }
                 new_img[pxl(width, height, i, j) + c] = median;
             }
@@ -306,20 +306,17 @@ unsigned char* threshold_adaptive_mean(unsigned char *img, int width, int height
     unsigned char *new_img = new unsigned char[size];
 
 #pragma omp parallel for
-    for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j++) {
-            unsigned int pixel = pxl(width, height, i, j);
-            unsigned char mean_intensity = (tmp[pixel] + tmp[pixel+1] + tmp[pixel+2]) / 3;
-            unsigned char pixel_intensity = (copy[pixel] + copy[pixel+1] + copy[pixel+2]) / 3;
-            if (pixel_intensity > mean_intensity-C) {
-                new_img[pixel] = 255;
-                new_img[pixel+1] = 255;
-                new_img[pixel+2] = 255;
-            } else {
-                new_img[pixel] = copy[pixel];
-                new_img[pixel+1] = copy[pixel+1];
-                new_img[pixel+2] = copy[pixel+2];
-            }
+    for (int p=0; p < size; p+=3) { // Go over all pixels
+        unsigned char mean_intensity = (tmp[p] + tmp[p+1] + tmp[p+2]) / 3;
+        unsigned char pixel_intensity = (copy[p] + copy[p+1] + copy[p+2]) / 3;
+        if (pixel_intensity > mean_intensity-C) {
+            new_img[p] = 255;
+            new_img[p+1] = 255;
+            new_img[p+2] = 255;
+        } else {
+            new_img[p] = copy[p];
+            new_img[p+1] = copy[p+1];
+            new_img[p+2] = copy[p+2];
         }
     }
     delete[] copy;
@@ -348,20 +345,17 @@ unsigned char* threshold_adaptive_gauss(unsigned char *img, int width, int heigh
     unsigned char *new_img = new unsigned char[size];
 
 #pragma omp parallel for
-    for (int i=0; i < height; i++) {
-        for (int j=0; j < width; j++) {
-            unsigned int pixel = pxl(width, height, i, j);
-            unsigned char mean_intensity = (tmp[pixel] + tmp[pixel+1] + tmp[pixel+2]) / 3;
-            unsigned char pixel_intensity = (copy[pixel] + copy[pixel+1] + copy[pixel+2]) / 3;
-            if (pixel_intensity > mean_intensity-C) {
-                new_img[pixel] = 255;
-                new_img[pixel+1] = 255;
-                new_img[pixel+2] = 255;
-            } else {
-                new_img[pixel] = copy[pixel];
-                new_img[pixel+1] = copy[pixel+1];
-                new_img[pixel+2] = copy[pixel+2];
-            }
+    for (int p=0; p < size; p+=3) { // Go over all pixels
+        unsigned char mean_intensity = (tmp[p] + tmp[p+1] + tmp[p+2]) / 3;
+        unsigned char pixel_intensity = (copy[p] + copy[p+1] + copy[p+2]) / 3;
+        if (pixel_intensity > mean_intensity-C) {
+            new_img[p] = 255;
+            new_img[p+1] = 255;
+            new_img[p+2] = 255;
+        } else {
+            new_img[p] = copy[p];
+            new_img[p+1] = copy[p+1];
+            new_img[p+2] = copy[p+2];
         }
     }
     delete[] copy;
