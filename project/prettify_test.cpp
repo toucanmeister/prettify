@@ -8,10 +8,9 @@ using namespace std;
 #define WRITE_IMG 2
 #define MEAN_FILTER 3
 #define GAUSS_FILTER 4
-#define MEDIAN_FILTER 5
-#define THRESHOLD 6
-#define THRESHOLD_ADAPTIVE_MEAN 7
-#define THRESHOLD_ADAPTIVE_GAUSS 8
+#define THRESHOLD 5
+#define THRESHOLD_ADAPTIVE_MEAN 6
+#define THRESHOLD_ADAPTIVE_GAUSS 7
 
 int read_image_test() {
     unsigned char *img;
@@ -81,32 +80,6 @@ int gauss_filter_test() {
     int width, height;
     img = read_image(in_filename, img, &width, &height);
     img = gauss_filter(img, width, height, 1);
-    if (img == nullptr) {
-        return 1;
-    }
-    check = read_image(check_filename, check, &width, &height);
-    if (check == nullptr) {
-        return 1;
-    }
-    for (int i=0; i < width*height*3; i++) {
-        if (abs(*(img+i) - *(check+i)) > 2) { // 2 units of wiggle-room to allow for rounding errors
-            delete[] img;
-            delete[] check;
-            return 1;
-        }
-    }
-    delete[] img;
-    delete[] check;
-    return 0;
-}
-
-int median_filter_test() {
-    char in_filename[] = "../test/in.ppm";
-    char check_filename[] = "../test/out_median.ppm";
-    unsigned char *img, *check;
-    int width, height;
-    img = read_image(in_filename, img, &width, &height);
-    img = median_filter(img, width, height, 1);
     if (img == nullptr) {
         return 1;
     }
@@ -221,9 +194,6 @@ int main(int argc, char* argv[]) {
             break;
         case GAUSS_FILTER:
             return gauss_filter_test();
-            break;
-        case MEDIAN_FILTER:
-            return median_filter_test();
             break;
         case THRESHOLD:
             return threshold_test();
