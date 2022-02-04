@@ -24,7 +24,7 @@ Prettify brings 6 routines to edit images you give it:
 - **Median Filter**: Removes noise, especially salt-and-pepper noise, without blurring as much as mean or gauss filter
 - **Global Threshold**: Removes backgrounds in images with clear brightness separation between fore- and background
 - **Adaptive Mean Threshold**: Removes backgrounds and shadows in **text-only** images
-- **Adaptive Gaussian Threshold**: Removes backgrounds and shadows in **text-only** images, sometimes leaves less noise than adaptive mean threshold
+- **Adaptive Gaussian Threshold**: Removes backgrounds and shadows in **text-only** images, sometimes leaves fewer speckles than adaptive mean threshold
 
 A standard call to improve a scanned document image `img.ppm` would be:
 ```
