@@ -44,13 +44,14 @@ For more information on how to use prettify, run `prettify -h` or `prettify --he
 
 ## Installation
 Prettify is written in C++ and thus needs to be compiled on your computer. This also means you will need a C++ compiler, CMake and the OpenMP library installed on your PC.
+
 After downloading the source files, use a command line to go into the folder `project`.
 
 Run the command `cmake -B build`.
 
-Run the command `cmake --build build`.
+Then run the command `cmake --build build`.
 
 The usable executable will be at `build/prettify`.
 
-> Tip: To check that the program works correctly and I did not make any mistakes writing it, you can test it:
+> Tip: To check that the program works correctly, you can test it:
 > Go into the folder `build` and run `ctest`.
