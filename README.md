@@ -1,19 +1,6 @@
-# Algorithm_Engineering
-
-Repository for exam assignment answers, project and paper for the course Algorithm Engineering in WiSe 2021/22.
-
-#### Answers
-Contains the answers to the weekly exam assignments.
-
-#### Project
-Contains the course project. See **prettify** below for more details.
-
-#### Paper
-Contains the paper corresponding to the course project.
-
-
 # prettify
-Prettify is a simple command-line based scanned document enhancer.
+
+Prettify is a simple command-line based scanned document enhancer created as a project for the course "Algorithm Engineering" in the winter semester of 2021/2022 at the FSU Jena. See `paper` for the accompanying report.
 
 ## Features
 Prettify works with **P3** (ASCII-encoded) portable pix map (**.ppm**) images. To convert to and from this format, I recommend IrfanView or `convert` on Linux.
